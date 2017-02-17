@@ -2,22 +2,47 @@ module Indexed
   extend ActiveSupport::Concern
 
   included do
-    after_save :submit_to_croucher_index!
-    after_destroy :remove_from_croucher_index!
+    after_save :enqueue_for_croucher_indexing
+    after_destroy :enqueue_for_croucher_index_removal
   end
 
   def document
-    if respond_to?(:index_uid) && index_uid
-      Document.find(index_uid)
+    unless @document
+      if respond_to?(:index_uid) && index_uid.present?
+        @document = Document.find(index_uid)
+      else
+        @document = Document.new_with_defaults
+      end
+    end
+    @document
+  end
+
+  def enqueue_for_croucher_indexing
+    CroucherIndexJob.perform_later(self.class.to_s, id, Time.now.to_i)
+  end
+  #
+  # |
+  # v
+  #
+  def submit_to_croucher_index!
+    doc = self.document || Document.new_with_defaults
+    doc.assign_attributes(croucher_index_data)
+    if doc.save
+      if respond_to?(:index_uid)
+        update_column :index_uid, doc.index_uid
+      end
+    else
+      Rails.logger.warn "INDEX FAIL"
     end
   end
 
-  def submit_to_croucher_index!
-    doc = self.document || Document.new
-    doc.assign_attributes(croucher_index_data)
-    doc.save
+  def enqueue_for_croucher_deindexing
+    CroucherDeindexJob.perform_later(self.class.to_s, id, Time.now.to_i)
   end
-
+  #
+  # |
+  # v
+  #
   def remove_from_croucher_index!
     if doc = self.document
       doc.destroy
@@ -31,12 +56,13 @@ module Indexed
       title: croucher_index_title,
       chinese_name: croucher_index_chinese_name,
       url: croucher_index_url,
-      content: croucher_index_content,
       document_type: croucher_index_document_type,
-      file: croucher_index_file,
+      content: croucher_index_content,
+      content_type: croucher_index_content_type,
       published_at: croucher_index_date,
+      confidentiality: croucher_index_confidentiality,
       terms: croucher_index_terms,
-      confidentiality: croucher_index_confidentiality
+      file: croucher_index_file
     }
   end
 
@@ -50,6 +76,14 @@ module Indexed
 
   def croucher_index_content
     nil
+  end
+
+  def croucher_index_content_type
+    nil
+  end
+
+  def croucher_index_document_type
+    "page"
   end
 
   def croucher_index_url

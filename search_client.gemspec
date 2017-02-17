@@ -18,8 +18,7 @@ Gem::Specification.new do |s|
   s.add_dependency "her"
   s.add_dependency "faraday"
   s.add_dependency "faraday_middleware"
-
-
+  s.add_dependency "yomu"
 
   s.add_development_dependency "sqlite3"
 end
