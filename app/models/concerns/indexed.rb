@@ -3,7 +3,7 @@ module Indexed
 
   included do
     after_save :enqueue_for_croucher_indexing
-    after_destroy :enqueue_for_croucher_index_removal
+    after_destroy :enqueue_for_croucher_deindexing
   end
 
   def document
@@ -21,8 +21,7 @@ module Indexed
     CroucherIndexJob.perform_later(self.class.to_s, id, Time.now.to_i)
   end
   #
-  # |
-  # v
+  # ↓ async
   #
   def submit_to_croucher_index!
     doc = self.document || Document.new_with_defaults
@@ -40,14 +39,14 @@ module Indexed
     CroucherDeindexJob.perform_later(self.class.to_s, id, Time.now.to_i)
   end
   #
-  # |
-  # v
+  # ↓ async
   #
   def remove_from_croucher_index!
     if doc = self.document
       doc.destroy
-    elsif croucher_index_url
-      # DELETE to /api/index/url/:url
+    elsif url = croucher_index_url
+      stem = Document.collection_path
+      doc.class.delete("#{stem}/url/#{url}")
     end
   end
 
