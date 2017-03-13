@@ -42,11 +42,12 @@ module Indexed
   # ↓ async
   #
   def remove_from_croucher_index!
-    if doc = self.document
-      doc.destroy
-    elsif url = croucher_index_url
+    if self.document.persisted?
+      self.document.destroy
+    elsif croucher_index_url.present?
       stem = Document.collection_path
-      doc.class.delete("#{stem}/url/#{url}")
+      url = CGI::escape(croucher_index_url)
+      Document.delete("#{stem}/url/#{url}")
     end
   end
 
