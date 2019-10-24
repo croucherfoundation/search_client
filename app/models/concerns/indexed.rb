@@ -28,7 +28,7 @@ module Indexed
     doc.assign_attributes(croucher_index_data)
     if doc.save
       if respond_to?(:index_uid)
-        update_column :index_uid, doc.index_uid
+        update_column :index_uid, doc.uid
       end
     else
       Rails.logger.warn "INDEX FAIL"
