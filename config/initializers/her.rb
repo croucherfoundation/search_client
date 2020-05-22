@@ -3,13 +3,10 @@ require 'faraday_middleware'
 require 'her'
 require 'her/middleware/json_api_parser'
 
-Settings.search ||= {}
-Settings.search[:protocol] ||= 'http'
-Settings.search[:api_host] ||= Settings.search[:host] || 'localhost'
-Settings.search[:api_port] ||= Settings.search[:port] || 8010
+api_url = ENV['SEARCH_API_URL'] || "#{Settings.search.protocol}://#{Settings.search.api_host}:#{Settings.search.api_port}"
 
 SEARCH_API = Her::API.new
-SEARCH_API.setup url: "#{Settings.search.protocol}://#{Settings.search.api_host}:#{Settings.search.api_port}" do |c|
+SEARCH_API.setup url: api_url do |c|
   # Request
   c.use FaradayMiddleware::EncodeJson
   # Response
