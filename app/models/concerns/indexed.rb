@@ -18,14 +18,14 @@ module Indexed
   end
 
   def enqueue_for_croucher_indexing
-    Rails.logger.debug "⚠️ enqueue_for_croucher_indexing -> #{self.class.to_s}, #{id}"
-    CroucherIndexJob.perform_later(self.class.to_s, id, Time.now.to_i)
+    # TODO: find out why CroucherIndexJob is failing to load Droom:: classes when running the index job.
+    # CroucherIndexJob.perform_later(self.class.to_s, id, Time.now.to_i)
+    submit_to_croucher_index!
   end
   #
   # ↓ async
   #
   def submit_to_croucher_index!
-    Rails.logger.debug "⚠️ submit_to_croucher_index! -> #{self.class.to_s}, #{id}, #{croucher_indexable?}"
     if croucher_indexable?
       doc = self.document || Document.new_with_defaults
       doc.assign_attributes(croucher_index_data)
@@ -40,7 +40,8 @@ module Indexed
   end
 
   def enqueue_for_croucher_deindexing
-    CroucherDeindexJob.perform_later(self.class.to_s, id, Time.now.to_i)
+    # CroucherDeindexJob.perform_later(self.class.to_s, id, Time.now.to_i)
+    remove_from_croucher_index!
   end
   #
   # ↓ async
