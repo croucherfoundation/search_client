@@ -2,7 +2,7 @@ module Indexed
   extend ActiveSupport::Concern
 
   included do
-    after_save :enqueue_for_croucher_indexing
+    after_save :enqueue_for_croucher_indexing, if: :croucher_index_auto?
     after_destroy :enqueue_for_croucher_deindexing
   end
 
@@ -18,9 +18,7 @@ module Indexed
   end
 
   def enqueue_for_croucher_indexing
-    # TODO: find out why CroucherIndexJob is failing to load Droom:: classes when running the index job.
-    # CroucherIndexJob.perform_later(self.class.to_s, id, Time.now.to_i)
-    submit_to_croucher_index!
+    CroucherIndexJob.perform_later(self.class.to_s, id, Time.now.to_i)
   end
   #
   # ↓ async
@@ -40,8 +38,7 @@ module Indexed
   end
 
   def enqueue_for_croucher_deindexing
-    # CroucherDeindexJob.perform_later(self.class.to_s, id, Time.now.to_i)
-    remove_from_croucher_index!
+    CroucherDeindexJob.perform_later(self.class.to_s, id, Time.now.to_i)
   end
   #
   # ↓ async
@@ -72,6 +69,10 @@ module Indexed
   end
 
   def croucher_indexable?
+    true
+  end
+
+  def croucher_index_auto?
     true
   end
 
