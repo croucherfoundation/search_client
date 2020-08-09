@@ -1,7 +1,7 @@
 module SearchClientHelper
 
   def search_url
-    ENV['SEARCH_URL'] || "#{Settings.search.protocol}://#{Settings.search.host}"
+    ENV['SEARCH_URL']
   end
 
 end

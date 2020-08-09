@@ -3,7 +3,7 @@ require 'faraday_middleware'
 require 'her'
 require 'her/middleware/json_api_parser'
 
-api_url = ENV['SEARCH_API_URL'] || "#{Settings.search.protocol}://#{Settings.search.api_host}:#{Settings.search.api_port}"
+api_url = ENV['SEARCH_API_URL']
 
 SEARCH_API = Her::API.new
 SEARCH_API.setup url: api_url do |c|
