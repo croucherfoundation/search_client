@@ -47,7 +47,7 @@ module Indexed
     if self.document.persisted?
       self.document.destroy
     elsif croucher_index_url.present?
-      stem = Document.collection_path
+      stem = '/api/documents'
       url = CGI::escape(croucher_index_url)
       Document.delete("#{stem}/url/#{url}")
     end
