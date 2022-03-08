@@ -3,6 +3,7 @@ class Document
   use_api SEARCH_API
   collection_path "/api/documents"
 
+  primary_key :uid
   include_root_in_json true
   parse_root_in_json false
 
@@ -55,4 +56,3 @@ class Document
   end
 
 end
-

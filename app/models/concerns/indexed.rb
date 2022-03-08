@@ -3,7 +3,6 @@ module Indexed
 
   included do
     after_save :enqueue_for_croucher_indexing, if: :croucher_index_auto?
-    after_destroy :enqueue_for_croucher_deindexing
   end
 
   def document
@@ -25,7 +24,11 @@ module Indexed
   #
   def submit_to_croucher_index!
     if croucher_indexable?
-      doc = self.document || Document.new_with_defaults
+      begin
+        doc = self.document
+      rescue => e
+        doc = Document.new_with_defaults
+      end
       doc.assign_attributes(croucher_index_data)
       if doc.save
         if respond_to?(:index_uid)
@@ -44,12 +47,16 @@ module Indexed
   # ↓ async
   #
   def remove_from_croucher_index!
-    if self.document.persisted?
+    begin
       self.document.destroy
-    elsif croucher_index_url.present?
-      stem = Document.collection_path
-      url = CGI::escape(croucher_index_url)
-      Document.delete("#{stem}/url/#{url}")
+    rescue
+      if croucher_index_url.present?
+        stem = Document.collection_path
+        url = CGI::escape(croucher_index_url)
+        Document.delete("#{stem}/by_url?url=#{url}")
+      end
+    ensure
+      self.destroy
     end
   end
 
