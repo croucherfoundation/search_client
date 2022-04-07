@@ -1,10 +1,7 @@
-class Document
-  include Her::JsonApi::Model
-  use_api SEARCH_API
-  collection_path "/api/documents"
-
-  include_root_in_json true
-  parse_root_in_json false
+class Document < ActiveResource::Base
+  
+  include SearchActiveResourceConfig
+  include FormatApiResponse
 
   def self.new_with_defaults(attributes={})
     Document.new({
