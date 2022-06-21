@@ -56,6 +56,7 @@ module Indexed
   def croucher_index_data
     {
       title: croucher_index_title,
+      professional_name: croucher_index_professional_name,
       chinese_name: croucher_index_chinese_name,
       url: croucher_index_url,
       document_type: croucher_index_document_type,
@@ -78,6 +79,10 @@ module Indexed
 
   def croucher_index_title
     read_attribute :title
+  end
+
+  def croucher_index_professional_name
+    nil
   end
 
   def croucher_index_chinese_name
