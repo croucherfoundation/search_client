@@ -1,4 +1,4 @@
-module FormatApiResponse
+module SearchFormatApiResponse
     include ActiveResource::Formats::JsonFormat
     attr_accessor :meta
   

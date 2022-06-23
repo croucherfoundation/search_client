@@ -1,7 +1,7 @@
 class Document < ActiveResource::Base
   
   include SearchActiveResourceConfig
-  include FormatApiResponse
+  include SearchFormatApiResponse
 
   def self.new_with_defaults(attributes={})
     Document.new({
