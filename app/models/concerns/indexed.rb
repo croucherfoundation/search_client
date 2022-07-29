@@ -26,7 +26,7 @@ module Indexed
   def submit_to_croucher_index!
     if croucher_indexable?
       doc = self.document || Document.new_with_defaults
-      doc.assign_attributes(croucher_index_data)
+      doc.attributes.deep_merge!(croucher_index_data)
       if doc.save
         if respond_to?(:index_uid)
           update_column :index_uid, doc.uid
