@@ -1,5 +1,5 @@
 class Document < ActiveResource::Base
-  
+
   include SearchActiveResourceConfig
   include SearchFormatApiResponse
 
@@ -27,6 +27,11 @@ class Document < ActiveResource::Base
     end
   end
 
+  def save
+    self.prefix_options[:document] = self.attributes
+    super
+  end
+
   ## File reads
   #
   def get_and_read(file)
@@ -52,4 +57,3 @@ class Document < ActiveResource::Base
   end
 
 end
-
