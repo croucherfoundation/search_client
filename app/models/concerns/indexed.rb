@@ -61,6 +61,7 @@ module Indexed
       url: croucher_index_url,
       document_type: croucher_index_document_type,
       content: croucher_index_content,
+      content_url: croucher_index_content_url,
       content_type: croucher_index_content_type,
       published_at: croucher_index_date,
       confidentiality: croucher_index_confidentiality,
@@ -90,6 +91,10 @@ module Indexed
   end
 
   def croucher_index_content
+    nil
+  end
+
+  def croucher_index_content_url
     nil
   end
 

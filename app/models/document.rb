@@ -10,6 +10,7 @@ class Document < ActiveResource::Base
       url: "",
       document_type: "",
       content: "",
+      content_url: "",
       content_type: "",
       published_at: "",
       confidentiality: "",
