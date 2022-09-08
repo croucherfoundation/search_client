@@ -31,6 +31,9 @@ module Indexed
         if respond_to?(:index_uid)
           update_column :index_uid, doc.uid
         end
+        if respond_to?(:indexed_at)
+          update_column :indexed_at, DateTime.now
+        end
       else
         Rails.logger.warn "INDEX FAIL"
       end
