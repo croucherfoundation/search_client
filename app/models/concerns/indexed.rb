@@ -3,7 +3,7 @@ module Indexed
 
   included do
     after_save :enqueue_for_croucher_indexing, if: :croucher_index_auto?
-    after_destroy :enqueue_for_croucher_deindexing
+    before_destroy :remove_from_croucher_index!
   end
 
   def document
@@ -47,12 +47,16 @@ module Indexed
   # ↓ async
   #
   def remove_from_croucher_index!
-    if self.document.persisted?
+    begin
       self.document.destroy
-    elsif croucher_index_url.present?
-      stem = Document.collection_path
-      url = CGI::escape(croucher_index_url)
-      Document.delete("#{stem}/url/#{url}")
+    rescue
+      if croucher_index_url.present?
+        stem = Document.collection_path
+        url = CGI::escape(croucher_index_url)
+        Document.delete("#{stem}/by_url?url=#{url}")
+      end
+    ensure
+      self.destroy
     end
   end
 
@@ -64,6 +68,7 @@ module Indexed
       url: croucher_index_url,
       document_type: croucher_index_document_type,
       content: croucher_index_content,
+      chinese_content: croucher_index_chinese_content,
       content_type: croucher_index_content_type,
       published_at: croucher_index_date,
       confidentiality: croucher_index_confidentiality,
@@ -93,6 +98,10 @@ module Indexed
   end
 
   def croucher_index_content
+    nil
+  end
+
+  def croucher_index_chinese_content
     nil
   end
 
