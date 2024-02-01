@@ -6,9 +6,9 @@ module SearchClient
       g.fixture_replacement :factory_girl, :dir => 'spec/factories'
     end
 
-    initializer "search_client.integration" do
-      ActiveSupport.on_load :action_controller do
-        helper SearchClientHelper
+    config.to_prepare do
+      Dir.glob(Rails.root + "app/helpers/*_helper.rb").each do |c|
+        require_dependency(c)
       end
     end
 
