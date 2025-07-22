@@ -24,7 +24,7 @@ class Document
 
   def file=(file)
     if file
-      if file.is_a?(Paperclip::Attachment)
+      if file.is_a?(ActiveStorage::Attached::One)
         self.content = get_and_read(file)
         self.content_type = file.content_type
         self.file_size = file.size
