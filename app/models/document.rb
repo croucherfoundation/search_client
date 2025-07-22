@@ -53,7 +53,7 @@ class Document
   end
 
   def content_from_path(path)
-    Yomu.new(path).text
+    Henkei.new(path).text
   end
 
 end
