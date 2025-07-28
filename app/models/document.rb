@@ -27,7 +27,7 @@ class Document
       if file.is_a?(ActiveStorage::Attached::One)
         self.content = get_and_read(file)
         self.content_type = file.content_type
-        self.file_size = file.size
+        self.file_size = file.byte_size
       end
     end
   end
@@ -35,21 +35,16 @@ class Document
   ## File reads
   #
   def get_and_read(file)
-    if File.file?(file.path)
-      content_from_path file.path
-    elsif file.queued_for_write[:original]
-      content_from_path file.queued_for_write[:original].path
-    else
-      tempfile_path = Rails.root.join("tmp/search/#{file.original_filename}")
-      FileUtils.mkdir_p(Rails.root.join("tmp/search"))
-      file.copy_to_local_file(:original, tempfile_path)
-      outcome = content_from_path tempfile_path
-      File.delete(tempfile_path) if File.file?(tempfile_path)
-      outcome
+    return "" unless file&.attached?
+
+    begin
+      file.open do |tempfile|
+        content_from_path tempfile.path
+      end
+    rescue => e
+      Rails.logger.warn "File read failure: #{e.message}"
+      ""
     end
-  rescue => e
-    Rails.logger.warn "File read failure: #{e.message}"
-    ""
   end
 
   def content_from_path(path)
